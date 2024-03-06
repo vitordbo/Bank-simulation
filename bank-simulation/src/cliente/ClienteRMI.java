@@ -6,10 +6,8 @@ import java.util.Scanner;
 
 import banco.BancoInterface;
 import banco.ContaCorrente;
-import servidor.ServidorChaves;
 
 public class ClienteRMI {
-
     public static void main(String[] args) {
         try {
             // Obtém o registro RMI
@@ -17,8 +15,6 @@ public class ClienteRMI {
 
             // Obtém o objeto remoto do servidor
             BancoInterface banco = (BancoInterface) registry.lookup("BancoService");
-
-            ServidorChaves servidorChaves = new ServidorChaves();
 
             Scanner scanner = new Scanner(System.in);
             System.out.println("Bem-vindo ao banco NuVitor");
@@ -34,6 +30,7 @@ public class ClienteRMI {
 
             // Verifica se a conta existe no banco
             if (banco.existeConta(conta)) {
+                
                 // Obtém a conta correspondente ao número fornecido
                 ContaCorrente contaCorrente = banco.obterConta(conta);
 
@@ -60,14 +57,24 @@ public class ClienteRMI {
                                 double valor = scannerSwitch.nextDouble();
                                 String msg = "Quero sacar money";
 
-                                banco.sacar(contaCorrente.getNumeroConta(), valor, servidorChaves.cifrar(msg), servidorChaves.gerarMAC(msg));
+                                // Criptografa a mensagem e gera o MAC
+                                String mensagemCifrada = banco.cifrarComChaveAES(msg);
+                                String mac = banco.gerarMACComChaveAES(msg);
+
+                                // Chama o método remoto no servidor para sacar
+                                System.out.println(banco.sacar(contaCorrente.getNumeroConta(), valor, mensagemCifrada, mac));
                                 break;
                             case 2:
                                 System.out.println("Digite o valor que deseja depositar: ");
                                 double valorDepo = scannerSwitch.nextDouble();
                                 String msgDepo = "Quero depositar money";
 
-                                System.out.println(banco.depositar(contaCorrente.getNumeroConta(), valorDepo, servidorChaves.cifrar(msgDepo), servidorChaves.gerarMAC(msgDepo)));
+                                // Criptografa a mensagem e gera o MAC
+                                String mensagemCifradaDepo = banco.cifrarComChaveAES(msgDepo);
+                                String macDepo = banco.gerarMACComChaveAES(msgDepo);
+
+                                // Chama o método remoto no servidor para depositar
+                                System.out.println(banco.depositar(contaCorrente.getNumeroConta(), valorDepo, mensagemCifradaDepo, macDepo));
                                 break;
                             case 3:
                                 System.out.println("Digite o valor que deseja transferir: ");
@@ -77,7 +84,12 @@ public class ClienteRMI {
                                 String contaTrans = scannerSwitch.next();
                                 String transf = "Quero transferir money";
 
-                                banco.transferir(contaCorrente.getNumeroConta(), banco.obterConta(contaTrans).getNumeroConta(), valorTrans, servidorChaves.cifrar(transf), servidorChaves.gerarMAC(transf));
+                                // Criptografa a mensagem e gera o MAC
+                                String mensagemCifradaTrans = banco.cifrarComChaveAES(transf);
+                                String macTrans = banco.gerarMACComChaveAES(transf);
+
+                                // Chama o método remoto no servidor para transferir
+                                System.out.println(banco.transferir(contaCorrente.getNumeroConta(), banco.obterConta(contaTrans).getNumeroConta(), valorTrans, mensagemCifradaTrans, macTrans));
                                 break;
                             case 0:
                                 sair = true;

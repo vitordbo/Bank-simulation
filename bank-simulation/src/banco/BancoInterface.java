@@ -3,6 +3,8 @@ package banco;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
+import servidor.ServidorChaves;
+
 public interface BancoInterface extends Remote {
     public String sacar(String conta, double valor, String mensagemCifrada, String mac) throws RemoteException;
     public String depositar(String conta, double valor, String mensagemCifrada, String mac) throws RemoteException;
@@ -15,5 +17,10 @@ public interface BancoInterface extends Remote {
 
     boolean existeConta(String numeroConta) throws RemoteException;
     ContaCorrente obterConta(String numeroConta) throws RemoteException;
+    ServidorChaves getServidorChaves() throws RemoteException;
 
+    public String cifrarComChaveAES(String texto) throws RemoteException;
+    public String decifrarComChaveAES(String textoCifrado) throws RemoteException;
+    public String gerarMACComChaveAES(String mensagem) throws RemoteException;
+    public boolean verificarMACComChaveAES(String mensagem, String macRecebido) throws RemoteException;
 }

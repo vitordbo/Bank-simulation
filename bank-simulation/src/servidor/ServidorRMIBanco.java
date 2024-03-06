@@ -2,8 +2,6 @@ package servidor;
 
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
 
 import banco.Banco;
 import banco.BancoInterface;
@@ -11,16 +9,15 @@ import banco.BancoInterface;
 public class ServidorRMIBanco {
     public static void main(String[] args) {
         try {
-            // Gera a chave AES
-            KeyGenerator keyGen = KeyGenerator.getInstance("AES");
-            keyGen.init(128); // Tamanho da chave
-            SecretKey chaveAES = keyGen.generateKey();
+
+            ServidorChaves servidorChaves = new ServidorChaves();
 
             // Cria o registro do RMI
             Registry registry = LocateRegistry.createRegistry(1099);
 
             // Cria e vincula o objeto remoto ao registro
-            BancoInterface banco = new Banco(chaveAES);
+            BancoInterface banco = new Banco(servidorChaves);
+
             registry.rebind("BancoService", banco);
 
             System.out.println("Servidor RMI do Banco pronto para receber conexões.");

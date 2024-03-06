@@ -43,11 +43,24 @@ public class ServidorChaves {
     public boolean verificarMAC(String mensagem, String macRecebido) {
         try {
             String macCalculado = gerarMAC(mensagem);
+
+            System.out.println("MAC CALCULADO " + macCalculado);
+
             return macRecebido.equals(macCalculado);
         } catch (NoSuchAlgorithmException | InvalidKeyException e) {
             e.printStackTrace();
             return false;
         }
+    }
+
+    // Métodos para autenticação de mensagens 
+    public boolean autenticarMensagem(String mensagem, String macRecebido) {
+        String decifrado = decifrar(mensagem);
+
+        System.out.println("MAC DECIFRAdo " + decifrado);
+        System.out.println("MAC RECEBIDO " + macRecebido);
+
+        return verificarMAC(decifrado, macRecebido);
     }
 
     public SecretKey getChave() {
@@ -114,9 +127,5 @@ public class ServidorChaves {
         return mensagem;
     }
 
-    // Métodos para autenticação de mensagens 
-    public boolean autenticarMensagem(String mensagem, String macRecebido) {
-        return verificarMAC(mensagem, macRecebido);
-    }
 
 }
