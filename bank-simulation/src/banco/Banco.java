@@ -24,6 +24,7 @@ public class Banco extends UnicastRemoteObject implements BancoInterface {
 
     private SecretKey chaveAES;
     private ServidorChaves servidorChaves;
+    private String chaveVernam;
 
     private double rendimentoPoupanca = 0.005; // 0.5% ao mês
     private double rendimentoRendaFixa = 0.015; // 1.5% ao mês
@@ -32,6 +33,7 @@ public class Banco extends UnicastRemoteObject implements BancoInterface {
         super();
         this.servidorChaves = servidorChaves;
         this.chaveAES = servidorChaves.getChave();
+        this.chaveVernam = servidorChaves.getChaveVernam();
 
         this.contas = new HashMap<>();
 
@@ -75,10 +77,14 @@ public class Banco extends UnicastRemoteObject implements BancoInterface {
 
     @Override
     public String cifrarComChaveAES(String texto) {
+        // Cifrar o texto com a cifra de Vernam
+        String textoCifradoVernam = cifrarVernam(texto);
+        
         try {
+            // Utiliza o AES para cifrar o texto cifrado pela cifra de Vernam
             Cipher cifrador = Cipher.getInstance("AES/ECB/PKCS5Padding");
             cifrador.init(Cipher.ENCRYPT_MODE, chaveAES);
-            byte[] bytesCifrados = cifrador.doFinal(texto.getBytes());
+            byte[] bytesCifrados = cifrador.doFinal(textoCifradoVernam.getBytes());
             return Base64.getEncoder().encodeToString(bytesCifrados);
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException
                 | IllegalBlockSizeException | BadPaddingException e) {
@@ -90,18 +96,22 @@ public class Banco extends UnicastRemoteObject implements BancoInterface {
     @Override
     public String decifrarComChaveAES(String textoCifrado) {
         try {
+            // Utiliza o AES para decifrar o texto
             byte[] bytesCifrados = Base64.getDecoder().decode(textoCifrado);
             Cipher decifrador = Cipher.getInstance("AES/ECB/PKCS5Padding");
             decifrador.init(Cipher.DECRYPT_MODE, chaveAES);
             byte[] bytesDecifrados = decifrador.doFinal(bytesCifrados);
-            return new String(bytesDecifrados);
+            String textoDecifradoVernam = new String(bytesDecifrados);
+            
+            // Decifra o texto decifrado pelo AES usando a cifra de Vernam
+            return decifrarVernam(textoDecifradoVernam);
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException
                 | IllegalBlockSizeException | BadPaddingException e) {
             e.printStackTrace();
         }
         return null;
     }
-
+    
     @Override
     public String gerarMACComChaveAES(String mensagem) {
         try {
@@ -128,10 +138,23 @@ public class Banco extends UnicastRemoteObject implements BancoInterface {
         }
     }
 
-    // Métodos para distribuição de chaves simétricas
-    public SecretKey distribuirChaveSimetrica() {
-        // Aqui poderíamos implementar a lógica para distribuir a chave simétrica
-        return chaveAES;
+    private String cifrarVernam(String mensagem) {
+        StringBuilder resultado = new StringBuilder();
+        for (int i = 0; i < mensagem.length(); i++) {
+            char caractere = mensagem.charAt(i);
+            // Garante que a chave seja repetida, se necessário
+            char chaveChar = chaveVernam.charAt(i % chaveVernam.length());
+            // XOR para cifrar
+            char cifrado = (char) (caractere ^ chaveChar);
+            resultado.append(cifrado);
+        }
+        return resultado.toString();
+    }
+    
+    // Método para decifrar uma mensagem cifrada usando a cifra de Vernam
+    private String decifrarVernam(String mensagemCifradaVernam) {
+        // Como Vernam é simétrico, cifrar e decifrar são os mesmos
+        return cifrarVernam(mensagemCifradaVernam);
     }
 
     @Override

@@ -17,6 +17,7 @@ public class Cliente implements Serializable {
     private String telefoneCliente;
     private String enderecoCliente;
     private SecretKey chaveAES;
+    private SecretKey chaveVernam;
     private SecretKey chaveHMAC;
 
     // Implementação de Serializable
@@ -39,8 +40,10 @@ public class Cliente implements Serializable {
     public void gerarChaves() {
         try {
             KeyGenerator geradorAES = KeyGenerator.getInstance("AES");
+            KeyGenerator geradorVernam = KeyGenerator.getInstance("AES");
             KeyGenerator geradorHMAC = KeyGenerator.getInstance("HmacSHA256");
             chaveAES = geradorAES.generateKey();
+            chaveVernam = geradorVernam.generateKey(); // Gerar chave para Vernam
             chaveHMAC = geradorHMAC.generateKey();
             System.out.println("Chaves geradas.");
         } catch (NoSuchAlgorithmException e) {
@@ -49,10 +52,27 @@ public class Cliente implements Serializable {
     }
 
     public String cifrarMensagem(String mensagem) throws Exception {
+        // Aplicar a cifra de Vernam na mensagem
+        String mensagemCifradaVernam = cifrarVernam(mensagem);
+
+        // Utilizar o AES para cifrar a mensagem cifrada pela cifra de Vernam
         Cipher cifrador = Cipher.getInstance("AES/ECB/PKCS5Padding");
         cifrador.init(Cipher.ENCRYPT_MODE, chaveAES);
-        byte[] textoCifrado = cifrador.doFinal(mensagem.getBytes());
+        byte[] textoCifrado = cifrador.doFinal(mensagemCifradaVernam.getBytes());
+
         return Base64.getEncoder().encodeToString(textoCifrado);
+    }
+
+    private String cifrarVernam(String mensagem) {
+        StringBuilder resultado = new StringBuilder();
+        for (int i = 0; i < mensagem.length(); i++) {
+            char caractere = mensagem.charAt(i);
+            char chaveChar = chaveVernam.toString().charAt(i % chaveVernam.toString().length()); // Usar a chave de Vernam
+            // XOR para cifrar com a cifra de Vernam
+            char cifrado = (char) (caractere ^ chaveChar);
+            resultado.append(cifrado);
+        }
+        return resultado.toString();
     }
 
     public String gerarMAC(String mensagem) throws NoSuchAlgorithmException, InvalidKeyException {
