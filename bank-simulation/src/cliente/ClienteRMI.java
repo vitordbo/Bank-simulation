@@ -48,6 +48,9 @@ public class ClienteRMI {
                         System.out.println("2. Depositar");
                         System.out.println("3. Transferir");
                         System.out.println("4. Saldo");
+                        System.out.println("5. Investimento Poupança");
+                        System.out.println("6. Investimento Renda Fixa");
+                        System.out.println("7. Simular Investimentos");
                         System.out.println("0. Sair");
                         int opcao = scannerSwitch.nextInt();
                         scannerSwitch.nextLine(); // Limpa o buffer
@@ -101,6 +104,48 @@ public class ClienteRMI {
 
                                 // Chama o método remoto no servidor para ver o saldo
                                 System.out.println(banco.verSaldo(contaCorrente.getNumeroConta(), mensagemCifradaSaldo, macSaldo));
+                                break;
+                            case 5:
+                                System.out.println("Digite o valor que deseja investir na poupança: ");
+                                double valorPoupan = scannerSwitch.nextDouble();
+
+                                String msgPoupanca = "Quero investir money na poupanca";
+
+                                // Criptografa a mensagem e gera o MAC
+                                String mensagemCifradaPoupan = banco.cifrarComChaveAES(msgPoupanca);
+                                String macPoupan = banco.gerarMACComChaveAES(msgPoupanca);
+
+                                // Chama o método remoto no servidor para investir
+                                System.out.println(banco.investirPoupanca(contaCorrente.getNumeroConta(), valorPoupan, mensagemCifradaPoupan, macPoupan));
+                                break;
+                            case 6:
+                                System.out.println("Digite o valor que deseja investir na renda fixa: ");
+                                double valorRendaFixa = scannerSwitch.nextDouble();
+
+                                String msgRendaFixa = "Quero investir money na renda fixa";
+
+                                // Criptografa a mensagem e gera o MAC
+                                String mensagemCifradaRendaFixa = banco.cifrarComChaveAES(msgRendaFixa);
+                                String macRendaFixa = banco.gerarMACComChaveAES(msgRendaFixa);
+
+                                // Chama o método remoto no servidor para investir
+                                System.out.println(banco.investirRendaFixa(contaCorrente.getNumeroConta(), valorRendaFixa, mensagemCifradaRendaFixa, macRendaFixa));
+                                break;
+                            case 7:
+                                System.out.println("Digite o valor para simular o investimento: ");
+                                double valorInves = scannerSwitch.nextDouble();
+
+                                System.out.println("Digite a quantidade de meses para simular o investimento: ");
+                                int meses = scannerSwitch.nextInt();
+
+                                String msgSimular = "Quero simular meu money";
+
+                                // Criptografa a mensagem e gera o MAC
+                                String mensagemCifradaSimula = banco.cifrarComChaveAES(msgSimular);
+                                String macSimular = banco.gerarMACComChaveAES(msgSimular);
+
+                                // Chama o método remoto no servidor para transferir
+                                System.out.println(banco.simularInvestimento(contaCorrente.getNumeroConta(), valorInves, meses, mensagemCifradaSimula, macSimular));
                                 break;
                             case 0:
                                 sair = true;

@@ -28,31 +28,6 @@ public class Banco extends UnicastRemoteObject implements BancoInterface {
     private double rendimentoPoupanca = 0.005; // 0.5% ao mês
     private double rendimentoRendaFixa = 0.015; // 1.5% ao mês
 
-    public Banco(SecretKey chaveAES) throws RemoteException {
-        super();
-        this.contas = new HashMap<>();
-
-        ServidorChaves servidorChaves = new ServidorChaves();
-        this.chaveAES = servidorChaves.getChave();
-
-        this.contas = new HashMap<>();
-
-        // Criando os clientes
-        Cliente vitor = new Cliente("12345", "111222333-45", "Vitor Duarte", "84992359696", "Pres Dutra 555");
-        Cliente fabio = new Cliente("54321", "222333444-56", "Fabio Oliveira", "8499256354", "Cunha da mota 16");
-        Cliente paulo = new Cliente("12526", "333444555-67", "Paulo Henrique", "84956854125", "Ufersa 68");
-
-        // Criando as contas correntes
-        ContaCorrente contaVitor = new ContaCorrente("01", vitor);
-        ContaCorrente contaFabio = new ContaCorrente("02", fabio);
-        ContaCorrente contaPaulo = new ContaCorrente("03", paulo);
-
-        // Adicionando as contas ao mapa de contas
-        this.contas.put(contaVitor.getNumeroConta(), contaVitor);
-        this.contas.put(contaFabio.getNumeroConta(), contaFabio);
-        this.contas.put(contaPaulo.getNumeroConta(), contaPaulo);
-    }
-
     public Banco(ServidorChaves servidorChaves) throws RemoteException {
         super();
         this.servidorChaves = servidorChaves;
@@ -281,72 +256,110 @@ public class Banco extends UnicastRemoteObject implements BancoInterface {
         }
     }
 
-
     @Override
-    public String investirPoupanca(ContaCorrente conta, double valor, String mensagemCifrada, String mac) throws RemoteException {
+    public String investirPoupanca(String numeroConta, double valor, String mensagemCifrada, String mac) throws RemoteException {
         // Verifica a autenticidade da mensagem
         if (!servidorChaves.autenticarMensagem(mensagemCifrada, mac)) {
             return "Falha na autenticação da mensagem.";
         }
-
+    
         // Descriptografa a mensagem
         String mensagem = servidorChaves.decifrar(mensagemCifrada);
+    
+        // Localiza a conta corrente com base no número da conta
+        ContaCorrente conta = contas.get(numeroConta);
+        if (conta != null) {
+            // Implementa a lógica de depósito
+            System.out.println("Desejo: " + mensagem);
+    
+            if (valor > 0) {
+                // Realiza o investimento na conta corrente encontrada
+                double rendimento = valor * rendimentoPoupanca;
+                double valorFinal = valor + rendimento;
+                conta.setSaldoPoupanca(valorFinal);
 
-        // Implementa a lógica de investimento na poupança
-        System.out.println("Desejo: " + mensagem);
-
-        double rendimento = valor * rendimentoPoupanca;
-        conta.setSaldoPos(rendimento); // ver se é so rendimento
-
-        System.out.println("Investimento de R$" + valor + " na poupança realizado com sucesso.");
-
-        // Retorna a resposta ao cliente
-        return "Operação de investimento na poupança realizada";
+                System.out.println("Investimento de R$" + valor + " na poupança realizado com sucesso.");
+                return "Investimento de R$" + valor + " na poupança realizado com sucesso. Seu saldo é de: " + conta.getSaldoPoupanca();
+            } else {
+                System.out.println("Valor de investimento inválido.");
+                return "Valor de investimento inválido.";
+            }
+        } else {
+            System.out.println("Conta poupança não encontrada.");
+            return "Conta poupança não encontrada.";
+        }
     }
 
     @Override
-    public String investirRendaFixa(ContaCorrente conta, double valor, String mensagemCifrada, String mac) throws RemoteException {
+    public String investirRendaFixa(String numeroConta, double valor, String mensagemCifrada, String mac) throws RemoteException {
         // Verifica a autenticidade da mensagem
         if (!servidorChaves.autenticarMensagem(mensagemCifrada, mac)) {
             return "Falha na autenticação da mensagem.";
         }
-
+    
         // Descriptografa a mensagem
         String mensagem = servidorChaves.decifrar(mensagemCifrada);
+    
+        // Localiza a conta corrente com base no número da conta
+        ContaCorrente conta = contas.get(numeroConta);
+        if (conta != null) {
+            // Implementa a lógica de depósito
+            System.out.println("Desejo: " + mensagem);
+    
+            if (valor > 0) {
+                // Realiza o investimento na conta corrente encontrada
+                double rendimento = valor * rendimentoRendaFixa;
+                double valorFinal = valor + rendimento;
+                conta.setSaldoRendaFixa(valorFinal);
 
-        // Implementa a lógica de investimento na renda fixa
-        System.out.println("Desejo: " + mensagem);
-
-        double rendimento = valor * rendimentoRendaFixa;
-        conta.setSaldoPos(rendimento);
-
-        System.out.println("Investimento de R$" + valor + " na renda fixa realizado com sucesso.");
- 
-        // Retorna a resposta ao cliente
-        return "Operação de investimento na renda fixa realizada";
+                System.out.println("Investimento de R$" + valor + " na renda fixa realizado com sucesso.");
+                return "Investimento de R$" + valor + " na renda fixa realizado com sucesso. Seu saldo é de: " + conta.getSaldoRendaFixa();
+            } else {
+                System.out.println("Valor de investimento inválido.");
+                return "Valor de investimento inválido.";
+            }
+        } else {
+            System.out.println("Conta poupança não encontrada.");
+            return "Conta poupança não encontrada.";
+        }
     }
 
     @Override
-    public String simularInvestimento(ContaCorrente conta, double valor, int meses, String mensagemCifrada, String mac) throws RemoteException {
-        // Verifica a autenticidade da mensagem
-        if (!servidorChaves.autenticarMensagem(mensagemCifrada, mac)) {
+    public String simularInvestimento(String numeroConta, double valor, int meses, String mensagemCifrada, String mac) throws RemoteException {
+          // Verifica a autenticidade da mensagem
+          if (!servidorChaves.autenticarMensagem(mensagemCifrada, mac)) {
             return "Falha na autenticação da mensagem.";
         }
-
+    
         // Descriptografa a mensagem
         String mensagem = servidorChaves.decifrar(mensagemCifrada);
+    
+        // Localiza a conta corrente com base no número da conta
+        ContaCorrente conta = contas.get(numeroConta);
+        if (conta != null) {
+            // Implementa a lógica de depósito
+            System.out.println("Desejo: " + mensagem);
+    
+            if (valor > 0) {
+                // Realiza o investimento na conta corrente encontrada
+                double rendimentoPoupanca = valor * this.rendimentoPoupanca * meses;
+                double rendimentoRendaFixa = valor * this.rendimentoRendaFixa * meses;
+                double valorTotalPou = valor + rendimentoPoupanca;
+                double valorTotalFixa = valor + rendimentoRendaFixa;
 
-        // Implementa a lógica de simulação de investimento
-        System.out.println("Desejo: " + mensagem);
+                System.out.println("Simulação de investimento para " + meses + " meses:");
+                System.out.println("Rendimento da poupança: R$" + rendimentoPoupanca);
+                System.out.println("Rendimento da renda fixa: R$" + rendimentoRendaFixa);
 
-        double rendimentoPoupanca = valor * this.rendimentoPoupanca * meses;
-        double rendimentoRendaFixa = valor * this.rendimentoRendaFixa * meses;
-        System.out.println("Simulação de investimento para " + meses + " meses:");
-        System.out.println("Rendimento da poupança: R$" + rendimentoPoupanca);
-        System.out.println("Rendimento da renda fixa: R$" + rendimentoRendaFixa);
-
-        // Retorna a resposta ao cliente
-        return "Simulação de investimento realizada";
+                return "Rendimento da poupança: R$" + valorTotalPou + "\n" + "Rendimento da renda fixa: R$" + valorTotalFixa + " em " + meses + " meses";
+            } else {
+                System.out.println("Valor de investimento inválido.");
+                return "Valor de investimento inválido.";
+            }
+        } else {
+            System.out.println("Conta poupança não encontrada.");
+            return "Conta poupança não encontrada.";
+        }
     }
 
     @Override

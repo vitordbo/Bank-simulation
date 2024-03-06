@@ -11,6 +11,8 @@ public class ContaCorrente implements Serializable {
     private double rendimentoPoupanca;
     private double rendimentoRendaFixa;
     private Cliente cliente;
+    private double saldoPoupanca;
+    private double saldoRendaFixa;
 
     // Implementação de Serializable
     private static final long serialVersionUID = 1L;
@@ -22,56 +24,22 @@ public class ContaCorrente implements Serializable {
         this.rendimentoPoupanca = 0.005; // 0.5% ao mês
         this.rendimentoRendaFixa = 0.015; // 1.5% ao mês
     }
+    
+    public double getSaldoPoupanca() {
+        return saldoPoupanca;
+    }
 
-    // // Métodos para saque, depósito e transferência
-    // public void sacar(double valor) {
-    //     if (this.saldo >= valor) {
-    //         this.saldo -= valor;
-    //         System.out.println("Saque de " + valor + " realizado com sucesso.");
-    //     } else {
-    //         System.out.println("Saldo insuficiente.");
-    //     }
-    // }
+    public void setSaldoPoupanca(double saldoPoupanca) {
+        this.saldoPoupanca = saldoPoupanca;
+    }
 
-    // public void depositar(double valor) {
-    //     if (valor > 0) {
-    //         saldo += valor;
-    //         System.out.println("Depósito de R$" + valor + " realizado com sucesso.");
-    //     } else {
-    //         System.out.println("Valor de depósito inválido.");
-    //     }
-    // }
+    public double getSaldoRendaFixa() {
+        return saldoRendaFixa;
+    }
 
-    // public void transferir(ContaCorrente destino, double valor) {
-    //     if (valor > 0 && valor <= saldo) {
-    //         this.sacar(valor);
-    //         destino.depositar(valor);
-    //         System.out.println("Transferência de R$" + valor + " realizada com sucesso para a conta " + destino.getNumeroConta() + ".");
-    //     } else {
-    //         System.out.println("Saldo insuficiente para transferência.");
-    //     }
-    // }
-
-    // // Métodos para investimentos
-    // public void investirPoupanca(double valor) {
-    //     double rendimento = valor * rendimentoPoupanca;
-    //     saldo += valor + rendimento;
-    //     System.out.println("Investimento de R$" + valor + " na poupança realizado com sucesso.");
-    // }
-
-    // public void investirRendaFixa(double valor) {
-    //     double rendimento = valor * rendimentoRendaFixa;
-    //     saldo += valor + rendimento;
-    //     System.out.println("Investimento de R$" + valor + " na renda fixa realizado com sucesso.");
-    // }
-
-    // public void simularInvestimento(double valor, int meses) {
-    //     double rendimentoPoupanca = valor * this.rendimentoPoupanca * meses;
-    //     double rendimentoRendaFixa = valor * this.rendimentoRendaFixa * meses;
-    //     System.out.println("Simulação de investimento para " + meses + " meses:");
-    //     System.out.println("Rendimento da poupança: R$" + rendimentoPoupanca);
-    //     System.out.println("Rendimento da renda fixa: R$" + rendimentoRendaFixa);
-    // }
+    public void setSaldoRendaFixa(double saldoRendaFixa) {
+        this.saldoRendaFixa = saldoRendaFixa;
+    }
 
     public double verificarSaldo() {
         return saldo;
@@ -98,7 +66,7 @@ public class ContaCorrente implements Serializable {
     }
 
     public void setRendimentoPoupanca(double rendimentoPoupanca) {
-        this.rendimentoPoupanca = rendimentoPoupanca;
+        this.rendimentoPoupanca += rendimentoPoupanca;
     }
 
     public double getRendimentoRendaFixa() {
@@ -106,7 +74,7 @@ public class ContaCorrente implements Serializable {
     }
 
     public void setRendimentoRendaFixa(double rendimentoRendaFixa) {
-        this.rendimentoRendaFixa = rendimentoRendaFixa;
+        this.rendimentoRendaFixa += rendimentoRendaFixa;
     }
 
     public Cliente getCliente() {

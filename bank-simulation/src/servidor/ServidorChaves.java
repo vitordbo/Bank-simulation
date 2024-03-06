@@ -108,6 +108,7 @@ public class ServidorChaves {
         
             String mensagemDecifrada = new String(bytesMensagemDecifrada);
             
+            System.out.println("<< Mensagem cifrada = " + textoCifrado);
             System.out.println("<< Mensagem decifrada = " + mensagemDecifrada);
         
             mensagem = mensagemDecifrada;
