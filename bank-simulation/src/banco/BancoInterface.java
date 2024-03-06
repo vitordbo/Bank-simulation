@@ -9,6 +9,7 @@ public interface BancoInterface extends Remote {
     public String sacar(String conta, double valor, String mensagemCifrada, String mac) throws RemoteException;
     public String depositar(String conta, double valor, String mensagemCifrada, String mac) throws RemoteException;
     public String transferir(String conta, String contaDestino, double valor, String mensagemCifrada, String mac) throws RemoteException;
+    public String verSaldo(String conta, String mensagemCifrada, String mac) throws RemoteException;
 
     // alterar para string depois
     public String investirPoupanca(ContaCorrente conta, double valor, String mensagemCifrada, String mac) throws RemoteException;

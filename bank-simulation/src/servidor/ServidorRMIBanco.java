@@ -9,7 +9,6 @@ import banco.BancoInterface;
 public class ServidorRMIBanco {
     public static void main(String[] args) {
         try {
-
             ServidorChaves servidorChaves = new ServidorChaves();
 
             // Cria o registro do RMI

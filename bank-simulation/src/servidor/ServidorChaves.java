@@ -57,7 +57,6 @@ public class ServidorChaves {
     public boolean autenticarMensagem(String mensagem, String macRecebido) {
         String decifrado = decifrar(mensagem);
 
-        System.out.println("MAC DECIFRAdo " + decifrado);
         System.out.println("MAC RECEBIDO " + macRecebido);
 
         return verificarMAC(decifrado, macRecebido);

@@ -47,6 +47,7 @@ public class ClienteRMI {
                         System.out.println("1. Sacar");
                         System.out.println("2. Depositar");
                         System.out.println("3. Transferir");
+                        System.out.println("4. Saldo");
                         System.out.println("0. Sair");
                         int opcao = scannerSwitch.nextInt();
                         scannerSwitch.nextLine(); // Limpa o buffer
@@ -90,6 +91,16 @@ public class ClienteRMI {
 
                                 // Chama o método remoto no servidor para transferir
                                 System.out.println(banco.transferir(contaCorrente.getNumeroConta(), banco.obterConta(contaTrans).getNumeroConta(), valorTrans, mensagemCifradaTrans, macTrans));
+                                break;
+                            case 4:
+                                String msgSaldo = "Quero ver meu saldo";
+
+                                // Criptografa a mensagem e gera o MAC
+                                String mensagemCifradaSaldo = banco.cifrarComChaveAES(msgSaldo);
+                                String macSaldo = banco.gerarMACComChaveAES(msgSaldo);
+
+                                // Chama o método remoto no servidor para ver o saldo
+                                System.out.println(banco.verSaldo(contaCorrente.getNumeroConta(), mensagemCifradaSaldo, macSaldo));
                                 break;
                             case 0:
                                 sair = true;

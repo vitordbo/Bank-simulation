@@ -257,6 +257,30 @@ public class Banco extends UnicastRemoteObject implements BancoInterface {
         }
     }
     
+    @Override
+    public String verSaldo(String numeroConta, String mensagemCifrada, String mac) throws RemoteException {
+        // Verifica a autenticidade da mensagem
+        if (!servidorChaves.autenticarMensagem(mensagemCifrada, mac)) {
+            return "Falha na autenticação da mensagem.";
+        }
+
+        // Descriptografa a mensagem
+        String mensagem = servidorChaves.decifrar(mensagemCifrada);
+
+        // Localiza a conta corrente com base no número da conta
+        ContaCorrente conta = contas.get(numeroConta);
+        if (conta != null) {
+            System.out.println("Desejo: " + mensagem);
+    
+            double saldo = conta.verificarSaldo();
+            System.out.println("Seu saldo é de R$" + saldo);
+            return "Consulta de saldo realizada. Seu saldo é de: " + saldo;
+        } else {
+            System.out.println("Conta corrente não encontrada.");
+            return "Conta corrente não encontrada.";
+        }
+    }
+
 
     @Override
     public String investirPoupanca(ContaCorrente conta, double valor, String mensagemCifrada, String mac) throws RemoteException {
