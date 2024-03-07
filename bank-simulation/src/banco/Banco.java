@@ -6,7 +6,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.InvalidKeyException;
 import java.util.Base64;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.crypto.BadPaddingException;
@@ -53,26 +52,11 @@ public class Banco extends UnicastRemoteObject implements BancoInterface {
         this.contas.put(contaPaulo.getNumeroConta(), contaPaulo);
     }
 
+    @Override
     public void criarConta(String numeroConta, String nomeCliente, Cliente cliente) {
         ContaCorrente novaConta = new ContaCorrente(numeroConta, cliente);
         contas.put(numeroConta, novaConta);
         System.out.println("Conta corrente criada com sucesso para o cliente " + nomeCliente + ".");
-    }
-
-    public ContaCorrente autenticarCliente(String numeroConta, String senha) {
-        if (contas.containsKey(numeroConta)) {
-            ContaCorrente conta = contas.get(numeroConta);
-            if (conta.getCliente().getSenha().equals(senha)) {
-                System.out.println("Cliente autenticado com sucesso.");
-                return conta;
-            }
-        }
-        System.out.println("Falha na autenticação do cliente.");
-        return null;
-    }
-
-    public SecretKey getChaveAES() {
-        return chaveAES;
     }
 
     @Override
@@ -123,19 +107,6 @@ public class Banco extends UnicastRemoteObject implements BancoInterface {
             e.printStackTrace();
         }
         return null;
-    }
-
-    @Override
-    public boolean verificarMACComChaveAES(String mensagem, String macRecebido) {
-        String macCalculado = gerarMACComChaveAES(mensagem);
-        return macCalculado != null && macCalculado.equals(macRecebido);
-    }
-
-    // Método para adicionar contas correntes ao banco
-    public void adicionarContas(List<ContaCorrente> contas) {
-        for (ContaCorrente conta : contas) {
-            this.contas.put(conta.getNumeroConta(), conta);
-        }
     }
 
     private String cifrarVernam(String mensagem) {
@@ -398,5 +369,10 @@ public class Banco extends UnicastRemoteObject implements BancoInterface {
     @Override
     public ServidorChaves getServidorChaves() {
         return this.servidorChaves;
+    }
+
+    @Override
+    public boolean autenticarMensagem(String mensagem, String macRecebido) throws RemoteException {
+        return servidorChaves.autenticarMensagem(mensagem, macRecebido);
     }
 }

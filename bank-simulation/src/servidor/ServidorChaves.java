@@ -29,7 +29,6 @@ public class ServidorChaves {
 
             // Gera chave de Vernam com o mesmo tamanho da chave AES
             chaveVernam = gerarChaveVernam(chave.getEncoded().length);
-            System.out.println("Chave de Vernam gerada: " + chaveVernam);
         } catch(NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
@@ -92,6 +91,16 @@ public class ServidorChaves {
         return mensagemCifradaAES;
     }
 
+    public String decifrar(String textoCifradoAES) {
+        // Utilizar o AES para decifrar a mensagem
+        String mensagemDecifradaVernam = decifrarAES(textoCifradoAES);
+
+        // Aplicar a decifra de Vernam na mensagem decifrada pelo AES
+        String mensagemDecifrada = decifrarVernam(mensagemDecifradaVernam);
+
+        return mensagemDecifrada;
+    }
+
     private String cifrarVernam(String mensagem) {
         StringBuilder resultado = new StringBuilder();
         for (int i = 0; i < mensagem.length(); i++) {
@@ -112,7 +121,6 @@ public class ServidorChaves {
             cifrador.init(Cipher.ENCRYPT_MODE, chave);
             bytesMensagemCifrada = cifrador.doFinal(textoCifradoVernam.getBytes());
             String mensagemCifrada = Base64.getEncoder().encodeToString(bytesMensagemCifrada);
-            System.out.println(">> Mensagem cifrada = " + mensagemCifrada);
             return mensagemCifrada;
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException |
                  IllegalBlockSizeException | BadPaddingException e) {
@@ -121,24 +129,14 @@ public class ServidorChaves {
         }
     }
 
-    public String decifrar(String textoCifradoAES) {
-        // Utilizar o AES para decifrar a mensagem
-        String mensagemDecifradaVernam = decifrarAES(textoCifradoAES);
-
-        // Aplicar a decifra de Vernam na mensagem decifrada pelo AES
-        String mensagemDecifrada = decifrarVernam(mensagemDecifradaVernam);
-
-        return mensagemDecifrada;
-    }
-
     private String decifrarAES(String textoCifradoAES) {
         try {
             Cipher decriptador = Cipher.getInstance("AES/ECB/PKCS5Padding");
             decriptador.init(Cipher.DECRYPT_MODE, chave);
             byte[] bytesMensagemDecifrada = decriptador.doFinal(Base64.getDecoder().decode(textoCifradoAES));
             String mensagemDecifrada = new String(bytesMensagemDecifrada);
-            System.out.println("<< Mensagem cifrada = " + textoCifradoAES);
-            System.out.println("<< Mensagem decifrada = " + mensagemDecifrada);
+            System.out.println("Mensagem cifrada = " + textoCifradoAES);
+            System.out.println("---------------------------");
             return mensagemDecifrada;
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException |
                  IllegalBlockSizeException | BadPaddingException e) {
