@@ -20,7 +20,6 @@ import servidor.ServidorChaves;
 
 public class Banco extends UnicastRemoteObject implements BancoInterface {
     private Map<String, ContaCorrente> contas;
-
     private SecretKey chaveAES;
     private ServidorChaves servidorChaves;
     private String chaveVernam;
