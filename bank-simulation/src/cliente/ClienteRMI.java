@@ -70,9 +70,14 @@ public class ClienteRMI {
                                         // Criptografa a mensagem e gera o MAC
                                         String mensagemCifrada = banco.cifrarComChaveAES(msg);
                                         String mac = banco.gerarMACComChaveAES(msg);
+                                        
+                                        // Assina o hash do hmac com a chave privada RSA
+                                        byte[] assinaturaSacar = banco.sign(mac.getBytes());
+
+                                        System.out.println("Hash hmac assinado");
    
                                         // Chama o método remoto no servidor para sacar
-                                        System.out.println(banco.sacar(contaCorrente.getNumeroConta(), valor, mensagemCifrada, mac));
+                                        System.out.println(banco.sacar(contaCorrente.getNumeroConta(), valor, mensagemCifrada, mac, assinaturaSacar));
                                         break;
                                     case 2:
                                         System.out.println("Digite o valor que deseja depositar: ");
@@ -82,9 +87,14 @@ public class ClienteRMI {
                                         // Criptografa a mensagem e gera o MAC
                                         String mensagemCifradaDepo = banco.cifrarComChaveAES(msgDepo);
                                         String macDepo = banco.gerarMACComChaveAES(msgDepo);
+
+                                        // Assina o hash do hmac com a chave privada RSA
+                                        byte[] assinaturaDepo = banco.sign(macDepo.getBytes());
+
+                                        System.out.println("Hash hmac assinado");
    
                                         // Chama o método remoto no servidor para depositar
-                                        System.out.println(banco.depositar(contaCorrente.getNumeroConta(), valorDepo, mensagemCifradaDepo, macDepo));
+                                        System.out.println(banco.depositar(contaCorrente.getNumeroConta(), valorDepo, mensagemCifradaDepo, macDepo, assinaturaDepo));
                                         break;
                                     case 3:
                                         System.out.println("Digite o valor que deseja transferir: ");
@@ -97,9 +107,14 @@ public class ClienteRMI {
                                         // Criptografa a mensagem e gera o MAC
                                         String mensagemCifradaTrans = banco.cifrarComChaveAES(transf);
                                         String macTrans = banco.gerarMACComChaveAES(transf);
+
+                                        // Assina o hash do hmac com a chave privada RSA
+                                        byte[] assinaturaTransf = banco.sign(macTrans.getBytes());
+
+                                        System.out.println("Hash hmac assinado");
    
                                         // Chama o método remoto no servidor para transferir
-                                        System.out.println(banco.transferir(contaCorrente.getNumeroConta(), banco.obterConta(contaTrans).getNumeroConta(), valorTrans, mensagemCifradaTrans, macTrans));
+                                        System.out.println(banco.transferir(contaCorrente.getNumeroConta(), banco.obterConta(contaTrans).getNumeroConta(), valorTrans, mensagemCifradaTrans, macTrans, assinaturaTransf));
                                         break;
                                     case 4:
                                         String msgSaldo = "Quero ver meu saldo";
@@ -107,9 +122,14 @@ public class ClienteRMI {
                                         // Criptografa a mensagem e gera o MAC
                                         String mensagemCifradaSaldo = banco.cifrarComChaveAES(msgSaldo);
                                         String macSaldo = banco.gerarMACComChaveAES(msgSaldo);
+
+                                        // Assina o hash do hmac com a chave privada RSA
+                                        byte[] assinaturaSaldo = banco.sign(macSaldo.getBytes());
+
+                                        System.out.println("Hash hmac assinado");
    
                                         // Chama o método remoto no servidor para ver o saldo
-                                        System.out.println(banco.verSaldo(contaCorrente.getNumeroConta(), mensagemCifradaSaldo, macSaldo));
+                                        System.out.println(banco.verSaldo(contaCorrente.getNumeroConta(), mensagemCifradaSaldo, macSaldo, assinaturaSaldo));
                                         break;
                                     case 5:
                                         System.out.println("Digite o valor que deseja investir na poupança: ");
@@ -120,9 +140,14 @@ public class ClienteRMI {
                                         // Criptografa a mensagem e gera o MAC
                                         String mensagemCifradaPoupan = banco.cifrarComChaveAES(msgPoupanca);
                                         String macPoupan = banco.gerarMACComChaveAES(msgPoupanca);
+
+                                        // Assina o hash do hmac com a chave privada RSA
+                                        byte[] assinaturaPoupa = banco.sign(macPoupan.getBytes());
+
+                                        System.out.println("Hash hmac assinado");
    
                                         // Chama o método remoto no servidor para investir
-                                        System.out.println(banco.investirPoupanca(contaCorrente.getNumeroConta(), valorPoupan, mensagemCifradaPoupan, macPoupan));
+                                        System.out.println(banco.investirPoupanca(contaCorrente.getNumeroConta(), valorPoupan, mensagemCifradaPoupan, macPoupan, assinaturaPoupa));
                                         break;
                                     case 6:
                                         System.out.println("Digite o valor que deseja investir na renda fixa: ");
@@ -133,9 +158,14 @@ public class ClienteRMI {
                                         // Criptografa a mensagem e gera o MAC
                                         String mensagemCifradaRendaFixa = banco.cifrarComChaveAES(msgRendaFixa);
                                         String macRendaFixa = banco.gerarMACComChaveAES(msgRendaFixa);
-   
+
+                                        // Assina o hash do hmac com a chave privada RSA
+                                        byte[] assinaturaRendaF = banco.sign(macRendaFixa.getBytes());
+
+                                        System.out.println("Hash hmac assinado");
+          
                                         // Chama o método remoto no servidor para investir
-                                        System.out.println(banco.investirRendaFixa(contaCorrente.getNumeroConta(), valorRendaFixa, mensagemCifradaRendaFixa, macRendaFixa));
+                                        System.out.println(banco.investirRendaFixa(contaCorrente.getNumeroConta(), valorRendaFixa, mensagemCifradaRendaFixa, macRendaFixa, assinaturaRendaF));
                                         break;
                                     case 7:
                                         System.out.println("Digite o valor para simular o investimento: ");
@@ -149,9 +179,14 @@ public class ClienteRMI {
                                         // Criptografa a mensagem e gera o MAC
                                         String mensagemCifradaSimula = banco.cifrarComChaveAES(msgSimular);
                                         String macSimular = banco.gerarMACComChaveAES(msgSimular);
-   
+
+                                        // Assina o hash do hmac com a chave privada RSA
+                                        byte[] assinaturaSimular = banco.sign(macSimular.getBytes());
+
+                                        System.out.println("Hash hmac assinado");
+
                                         // Chama o método remoto no servidor para simular
-                                        System.out.println(banco.simularInvestimento(contaCorrente.getNumeroConta(), valorInves, meses, mensagemCifradaSimula, macSimular));
+                                        System.out.println(banco.simularInvestimento(contaCorrente.getNumeroConta(), valorInves, meses, mensagemCifradaSimula, macSimular, assinaturaSimular));
                                         break;
                                     case 0:
                                         sair = true;
@@ -242,13 +277,18 @@ public class ClienteRMI {
                                         System.out.println("Digite o valor que deseja sacar: ");
                                         double valor = scannerSwitch.nextDouble();
                                         String msg = "Quero sacar money";
-   
+
                                         // Criptografa a mensagem e gera o MAC
                                         String mensagemCifrada = banco.cifrarComChaveAES(msg);
                                         String mac = banco.gerarMACComChaveAES(msg);
-   
+                                        
+                                        // Assina o hash do hmac com a chave privada RSA
+                                        byte[] assinaturaSacar = banco.sign(mac.getBytes());
+
+                                        System.out.println("Hash hmac assinado");
+
                                         // Chama o método remoto no servidor para sacar
-                                        System.out.println(banco.sacar(contaCorrente.getNumeroConta(), valor, mensagemCifrada, mac));
+                                        System.out.println(banco.sacar(contaCorrente.getNumeroConta(), valor, mensagemCifrada, mac, assinaturaSacar));
                                         break;
                                     case 2:
                                         System.out.println("Digite o valor que deseja depositar: ");
@@ -258,76 +298,107 @@ public class ClienteRMI {
                                         // Criptografa a mensagem e gera o MAC
                                         String mensagemCifradaDepo = banco.cifrarComChaveAES(msgDepo);
                                         String macDepo = banco.gerarMACComChaveAES(msgDepo);
+
+                                        // Assina o hash do hmac com a chave privada RSA
+                                        byte[] assinaturaDepo = banco.sign(macDepo.getBytes());
+
+                                        System.out.println("Hash hmac assinado");
    
                                         // Chama o método remoto no servidor para depositar
-                                        System.out.println(banco.depositar(contaCorrente.getNumeroConta(), valorDepo, mensagemCifradaDepo, macDepo));
+                                        System.out.println(banco.depositar(contaCorrente.getNumeroConta(), valorDepo, mensagemCifradaDepo, macDepo, assinaturaDepo));
                                         break;
                                     case 3:
                                         System.out.println("Digite o valor que deseja transferir: ");
                                         double valorTrans = scannerSwitch.nextDouble();
-   
+
                                         System.out.println("Digite a conta para qual deseja transferir: ");
                                         String contaTrans = scannerSwitch.next();
                                         String transf = "Quero transferir money";
-   
+
                                         // Criptografa a mensagem e gera o MAC
                                         String mensagemCifradaTrans = banco.cifrarComChaveAES(transf);
                                         String macTrans = banco.gerarMACComChaveAES(transf);
-   
+
+                                        // Assina o hash do hmac com a chave privada RSA
+                                        byte[] assinaturaTransf = banco.sign(macTrans.getBytes());
+
+                                        System.out.println("Hash hmac assinado");
+
                                         // Chama o método remoto no servidor para transferir
-                                        System.out.println(banco.transferir(contaCorrente.getNumeroConta(), banco.obterConta(contaTrans).getNumeroConta(), valorTrans, mensagemCifradaTrans, macTrans));
+                                        System.out.println(banco.transferir(contaCorrente.getNumeroConta(), banco.obterConta(contaTrans).getNumeroConta(), valorTrans, mensagemCifradaTrans, macTrans, assinaturaTransf));
                                         break;
                                     case 4:
                                         String msgSaldo = "Quero ver meu saldo";
-   
+    
                                         // Criptografa a mensagem e gera o MAC
                                         String mensagemCifradaSaldo = banco.cifrarComChaveAES(msgSaldo);
                                         String macSaldo = banco.gerarMACComChaveAES(msgSaldo);
-   
+
+                                        // Assina o hash do hmac com a chave privada RSA
+                                        byte[] assinaturaSaldo = banco.sign(macSaldo.getBytes());
+
+                                        System.out.println("Hash hmac assinado");
+
                                         // Chama o método remoto no servidor para ver o saldo
-                                        System.out.println(banco.verSaldo(contaCorrente.getNumeroConta(), mensagemCifradaSaldo, macSaldo));
+                                        System.out.println(banco.verSaldo(contaCorrente.getNumeroConta(), mensagemCifradaSaldo, macSaldo, assinaturaSaldo));
                                         break;
                                     case 5:
                                         System.out.println("Digite o valor que deseja investir na poupança: ");
                                         double valorPoupan = scannerSwitch.nextDouble();
-   
+
                                         String msgPoupanca = "Quero investir money na poupanca";
-   
+
                                         // Criptografa a mensagem e gera o MAC
                                         String mensagemCifradaPoupan = banco.cifrarComChaveAES(msgPoupanca);
                                         String macPoupan = banco.gerarMACComChaveAES(msgPoupanca);
-   
+
+                                        // Assina o hash do hmac com a chave privada RSA
+                                        byte[] assinaturaPoupa = banco.sign(macPoupan.getBytes());
+
+                                        System.out.println("Hash hmac assinado");
+
                                         // Chama o método remoto no servidor para investir
-                                        System.out.println(banco.investirPoupanca(contaCorrente.getNumeroConta(), valorPoupan, mensagemCifradaPoupan, macPoupan));
+                                        System.out.println(banco.investirPoupanca(contaCorrente.getNumeroConta(), valorPoupan, mensagemCifradaPoupan, macPoupan, assinaturaPoupa));
                                         break;
                                     case 6:
                                         System.out.println("Digite o valor que deseja investir na renda fixa: ");
                                         double valorRendaFixa = scannerSwitch.nextDouble();
-   
+
                                         String msgRendaFixa = "Quero investir money na renda fixa";
-   
+
                                         // Criptografa a mensagem e gera o MAC
                                         String mensagemCifradaRendaFixa = banco.cifrarComChaveAES(msgRendaFixa);
                                         String macRendaFixa = banco.gerarMACComChaveAES(msgRendaFixa);
-   
+
+                                        // Assina o hash do hmac com a chave privada RSA
+                                        byte[] assinaturaRendaF = banco.sign(macRendaFixa.getBytes());
+
+                                        System.out.println("Hash hmac assinado");
+        
                                         // Chama o método remoto no servidor para investir
-                                        System.out.println(banco.investirRendaFixa(contaCorrente.getNumeroConta(), valorRendaFixa, mensagemCifradaRendaFixa, macRendaFixa));
+                                        System.out.println(banco.investirRendaFixa(contaCorrente.getNumeroConta(), valorRendaFixa, mensagemCifradaRendaFixa, macRendaFixa, assinaturaRendaF));
                                         break;
                                     case 7:
                                         System.out.println("Digite o valor para simular o investimento: ");
                                         double valorInves = scannerSwitch.nextDouble();
-   
+
                                         System.out.println("Digite a quantidade de meses para simular o investimento: ");
                                         int meses = scannerSwitch.nextInt();
-   
+
                                         String msgSimular = "Quero simular meu money";
-   
+
                                         // Criptografa a mensagem e gera o MAC
                                         String mensagemCifradaSimula = banco.cifrarComChaveAES(msgSimular);
                                         String macSimular = banco.gerarMACComChaveAES(msgSimular);
-   
-                                        // Chama o método remoto no servidor para transferir
-                                        System.out.println(banco.simularInvestimento(contaCorrente.getNumeroConta(), valorInves, meses, mensagemCifradaSimula, macSimular));
+
+                                        // Assina o hash do hmac com a chave privada RSA
+                                        byte[] assinaturaSimular = banco.sign(macSimular.getBytes());
+
+                                        System.out.println("Hash hmac assinado");
+
+
+                                        // Chama o método remoto no servidor para simular
+                                        System.out.println(banco.simularInvestimento(contaCorrente.getNumeroConta(), valorInves, meses, mensagemCifradaSimula, macSimular, assinaturaSimular));
                                         break;
                                     case 0:
                                         sair = true;

@@ -2,8 +2,8 @@ package banco;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.security.NoSuchAlgorithmException;
-import java.security.InvalidKeyException;
+import java.security.*;
+import java.security.interfaces.RSAPublicKey;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
@@ -17,12 +17,13 @@ import javax.crypto.SecretKey;
 
 import cliente.Cliente;
 import servidor.ServidorChaves;
+import java.math.BigInteger;
 
 public class Banco extends UnicastRemoteObject implements BancoInterface {
     private Map<String, ContaCorrente> contas;
     private SecretKey chaveAES;
     private ServidorChaves servidorChaves;
-    private String chaveVernam;
+    private String chaveVernam;   
 
     private double rendimentoPoupanca = 0.005; // 0.5% ao mês
     private double rendimentoRendaFixa = 0.015; // 1.5% ao mês
@@ -128,7 +129,7 @@ public class Banco extends UnicastRemoteObject implements BancoInterface {
     }
 
     @Override
-    public String sacar(String numeroConta, double valor, String mensagemCifrada, String mac) throws RemoteException {
+    public String sacar(String numeroConta, double valor, String mensagemCifrada, String mac, byte[] assinatura) throws RemoteException {
         // Verifica a autenticidade da mensagem
         if (!servidorChaves.autenticarMensagem(mensagemCifrada, mac)) {
             return "Falha na autenticação da mensagem.";
@@ -140,6 +141,19 @@ public class Banco extends UnicastRemoteObject implements BancoInterface {
         // Localiza a conta corrente com base no número da conta
         ContaCorrente conta = contas.get(numeroConta);
         if (conta != null) {
+            // Verifica a assinatura
+            System.out.println("Mensagem decifrada: " + mensagem);
+            System.out.println("Verificando assinatura...");
+
+            // Verifica a assinatura com a chave pública do emissor no receptor  
+            boolean assinaturaValida = verifySignature(mac.getBytes(), assinatura);
+
+            if (!assinaturaValida) { 
+                return "Assinatura inválida.";
+            } else {
+                System.out.println("Assinatura verificada");
+            }
+            
             // lógica de saque
             System.out.println("Desejo: " + mensagem);
     
@@ -147,7 +161,7 @@ public class Banco extends UnicastRemoteObject implements BancoInterface {
                 conta.setSaldoNeg(valor);
                 System.out.println("Saque de " + valor + " realizado com sucesso.");
                 System.out.println("Seu saldo é de: " + conta.verificarSaldo());
-                return "Operação de saque realizada. Seu saldo é de: " + conta.verificarSaldo(); // mudar retorno aqui para mostrar o saldo ou colocar consultar saldo
+                return "Operação de saque realizada. Seu saldo é de: " + conta.verificarSaldo(); 
             } else {
                 System.out.println("Saldo insuficiente.");
                 return "Saldo insuficiente para saque.";
@@ -159,7 +173,7 @@ public class Banco extends UnicastRemoteObject implements BancoInterface {
     }
     
     @Override
-    public String depositar(String numeroConta, double valor, String mensagemCifrada, String mac) throws RemoteException {
+    public String depositar(String numeroConta, double valor, String mensagemCifrada, String mac, byte[] assinatura) throws RemoteException {
         // Verifica a autenticidade da mensagem
         if (!servidorChaves.autenticarMensagem(mensagemCifrada, mac)) {
             return "Falha na autenticação da mensagem.";
@@ -171,7 +185,20 @@ public class Banco extends UnicastRemoteObject implements BancoInterface {
         // Localiza a conta corrente com base no número da conta
         ContaCorrente conta = contas.get(numeroConta);
         if (conta != null) {
-            // Implementa a lógica de depósito
+            // Verifica a assinatura
+            System.out.println("Mensagem decifrada: " + mensagem);
+            System.out.println("Verificando assinatura...");
+
+            // Verifica a assinatura com a chave pública do emissor no receptor
+            boolean assinaturaValida = verifySignature(mac.getBytes(), assinatura);
+
+            if (!assinaturaValida) { 
+                return "Assinatura inválida.";
+            } else {
+                System.out.println("Assinatura verificada");
+            }
+    
+            // lógica de depósito
             System.out.println("Desejo: " + mensagem);
     
             if (valor > 0) {
@@ -188,9 +215,9 @@ public class Banco extends UnicastRemoteObject implements BancoInterface {
             return "Conta corrente não encontrada.";
         }
     }
-    
+
     @Override
-    public String transferir(String numeroContaOrigem, String numeroContaDestino, double valor, String mensagemCifrada, String mac) throws RemoteException {
+    public String transferir(String numeroContaOrigem, String numeroContaDestino, double valor, String mensagemCifrada, String mac, byte[] assinatura) throws RemoteException {
         // Verifica a autenticidade da mensagem
         if (!servidorChaves.autenticarMensagem(mensagemCifrada, mac)) {
             return "Falha na autenticação da mensagem.";
@@ -202,8 +229,22 @@ public class Banco extends UnicastRemoteObject implements BancoInterface {
         // Localiza as contas correntes com base nos números das contas
         ContaCorrente contaOrigem = contas.get(numeroContaOrigem);
         ContaCorrente contaDestino = contas.get(numeroContaDestino);
+        
         if (contaOrigem != null && contaDestino != null) {
-            // Implementa a lógica de transferência
+            // Verifica a assinatura
+            System.out.println("Mensagem decifrada: " + mensagem);
+            System.out.println("Verificando assinatura...");
+
+            // Verifica a assinatura com a chave pública do emissor no receptor
+            boolean assinaturaValida = verifySignature(mac.getBytes(), assinatura);
+
+            if (!assinaturaValida) { 
+                return "Assinatura inválida.";
+            } else {
+                System.out.println("Assinatura verificada");
+            }
+
+            // lógica de transferência
             System.out.println("Desejo: " + mensagem);
     
             if (valor > 0 && valor <= contaOrigem.verificarSaldo()) {
@@ -226,7 +267,7 @@ public class Banco extends UnicastRemoteObject implements BancoInterface {
     }
     
     @Override
-    public String verSaldo(String numeroConta, String mensagemCifrada, String mac) throws RemoteException {
+    public String verSaldo(String numeroConta, String mensagemCifrada, String mac, byte[] assinatura) throws RemoteException {
         // Verifica a autenticidade da mensagem
         if (!servidorChaves.autenticarMensagem(mensagemCifrada, mac)) {
             return "Falha na autenticação da mensagem.";
@@ -238,6 +279,19 @@ public class Banco extends UnicastRemoteObject implements BancoInterface {
         // Localiza a conta corrente com base no número da conta
         ContaCorrente conta = contas.get(numeroConta);
         if (conta != null) {
+            // Verifica a assinatura
+            System.out.println("Mensagem decifrada: " + mensagem);
+            System.out.println("Verificando assinatura...");
+
+            // Verifica a assinatura com a chave pública do emissor no receptor
+            boolean assinaturaValida = verifySignature(mac.getBytes(), assinatura);
+
+            if (!assinaturaValida) { 
+                return "Assinatura inválida.";
+            } else {
+                System.out.println("Assinatura verificada");
+            }
+
             System.out.println("Desejo: " + mensagem);
     
             double saldo = conta.verificarSaldo();
@@ -250,7 +304,7 @@ public class Banco extends UnicastRemoteObject implements BancoInterface {
     }
 
     @Override
-    public String investirPoupanca(String numeroConta, double valor, String mensagemCifrada, String mac) throws RemoteException {
+    public String investirPoupanca(String numeroConta, double valor, String mensagemCifrada, String mac, byte[] assinatura) throws RemoteException {
         // Verifica a autenticidade da mensagem
         if (!servidorChaves.autenticarMensagem(mensagemCifrada, mac)) {
             return "Falha na autenticação da mensagem.";
@@ -262,7 +316,20 @@ public class Banco extends UnicastRemoteObject implements BancoInterface {
         // Localiza a conta corrente com base no número da conta
         ContaCorrente conta = contas.get(numeroConta);
         if (conta != null) {
-            // Implementa a lógica de depósito
+            // Verifica a assinatura
+            System.out.println("Mensagem decifrada: " + mensagem);
+            System.out.println("Verificando assinatura...");
+
+            // Verifica a assinatura com a chave pública do emissor no receptor
+            boolean assinaturaValida = verifySignature(mac.getBytes(), assinatura);
+
+            if (!assinaturaValida) { 
+                return "Assinatura inválida.";
+            } else {
+                System.out.println("Assinatura verificada");
+            }
+
+            // lógica de depósito
             System.out.println("Desejo: " + mensagem);
     
             if (valor > 0) {
@@ -284,7 +351,7 @@ public class Banco extends UnicastRemoteObject implements BancoInterface {
     }
 
     @Override
-    public String investirRendaFixa(String numeroConta, double valor, String mensagemCifrada, String mac) throws RemoteException {
+    public String investirRendaFixa(String numeroConta, double valor, String mensagemCifrada, String mac, byte[] assinatura) throws RemoteException {
         // Verifica a autenticidade da mensagem
         if (!servidorChaves.autenticarMensagem(mensagemCifrada, mac)) {
             return "Falha na autenticação da mensagem.";
@@ -296,7 +363,19 @@ public class Banco extends UnicastRemoteObject implements BancoInterface {
         // Localiza a conta corrente com base no número da conta
         ContaCorrente conta = contas.get(numeroConta);
         if (conta != null) {
-            // Implementa a lógica de depósito
+            // Verifica a assinatura
+            System.out.println("Mensagem decifrada: " + mensagem);
+            System.out.println("Verificando assinatura...");
+
+            // Verifica a assinatura com a chave pública do emissor no receptor
+            boolean assinaturaValida = verifySignature(mac.getBytes(), assinatura);
+
+            if (!assinaturaValida) { 
+                return "Assinatura inválida.";
+            } else {
+                System.out.println("Assinatura verificada");
+            }
+            
             System.out.println("Desejo: " + mensagem);
     
             if (valor > 0) {
@@ -318,7 +397,7 @@ public class Banco extends UnicastRemoteObject implements BancoInterface {
     }
 
     @Override
-    public String simularInvestimento(String numeroConta, double valor, int meses, String mensagemCifrada, String mac) throws RemoteException {
+    public String simularInvestimento(String numeroConta, double valor, int meses, String mensagemCifrada, String mac, byte[] assinatura) throws RemoteException {
           // Verifica a autenticidade da mensagem
           if (!servidorChaves.autenticarMensagem(mensagemCifrada, mac)) {
             return "Falha na autenticação da mensagem.";
@@ -330,7 +409,19 @@ public class Banco extends UnicastRemoteObject implements BancoInterface {
         // Localiza a conta corrente com base no número da conta
         ContaCorrente conta = contas.get(numeroConta);
         if (conta != null) {
-            // Implementa a lógica de depósito
+            // Verifica a assinatura
+            System.out.println("Mensagem decifrada: " + mensagem);
+            System.out.println("Verificando assinatura...");
+
+            // Verifica a assinatura com a chave pública do emissor no receptor
+            boolean assinaturaValida = verifySignature(mac.getBytes(), assinatura);
+
+            if (!assinaturaValida) { 
+                return "Assinatura inválida.";
+            } else {
+                System.out.println("Assinatura verificada");
+            }
+
             System.out.println("Desejo: " + mensagem);
     
             if (valor > 0) {
@@ -373,5 +464,71 @@ public class Banco extends UnicastRemoteObject implements BancoInterface {
     @Override
     public boolean autenticarMensagem(String mensagem, String macRecebido) throws RemoteException {
         return servidorChaves.autenticarMensagem(mensagem, macRecebido);
+    }
+
+    @Override
+    public byte[] sign(byte[] message) {
+        // Calcula o hash da mensagem
+        byte[] hash = calcularHash(message);
+
+        // Assina o hash usando a chave privada
+        BigInteger signature = new BigInteger(hash).modPow(servidorChaves.getPriavteKeyRsa(), servidorChaves.getModulusRsa());
+
+        System.out.println("Mensagem assinada");
+        return signature.toByteArray();
+    }
+
+    @Override
+    public byte[] calcularHash(byte[] message) {
+        try {
+            // Obtém uma instância do MessageDigest com o algoritmo SHA-256
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+
+            // Calcula o hash da mensagem
+            byte[] hash = digest.digest(message);
+
+            return hash;
+        } catch (NoSuchAlgorithmException e) {
+            // Lidar com exceção de algoritmo de hash não encontrado
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    @Override
+    public boolean verifySignature(byte[] message, byte[] signature) {
+        try {
+            // Transforma a chave pública em RSAPublicKey
+            RSAPublicKey rsaPubKey = (RSAPublicKey) servidorChaves.getPublicKeyRsa();
+
+            // Calcula o hash da mensagem
+            byte[] calculatedHash = calcularHash(message);
+
+            // Converte a assinatura recebida em um BigInteger
+            BigInteger sig = new BigInteger(signature);
+
+            // Executa a operação de exponenciação modular para obter a assinatura decifrada
+            BigInteger decryptedSignature = sig.modPow(rsaPubKey.getPublicExponent(), rsaPubKey.getModulus());
+
+            // Converte o hash calculado em BigInteger
+            BigInteger hashBigInt = new BigInteger(1, calculatedHash);
+
+            // Compara a assinatura decifrada com o hash calculado
+            if (decryptedSignature.equals(hashBigInt)) {
+                System.out.println("Assinatura válida.");
+                return true;
+            } else {
+                System.out.println("Assinatura inválida.");
+                return false;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    @Override
+    public PublicKey getPublicKey(){
+        return servidorChaves.getPublicKeyRsa();
     }
 }

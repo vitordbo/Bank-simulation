@@ -1,7 +1,9 @@
 package servidor;
 
+import java.math.BigInteger;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
 import java.util.Base64;
 
 import javax.crypto.BadPaddingException;
@@ -12,13 +14,38 @@ import javax.crypto.Mac;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 
-public class ServidorChaves {
+import rsa.RSA;
+
+
+public class ServidorChaves  {
     private SecretKey chave;
     private String chaveVernam;
     private KeyGenerator geradorDeChaves;
 
+    // rsa
+    private RSA rsa;
+    private BigInteger privateKey;
+    private BigInteger modulus;
+    private PublicKey rsaPublicKey;
+
     public ServidorChaves() {
+        this.rsa = new RSA(2048);
+        this.privateKey = rsa.getPrivateKey();
+        this.modulus = rsa.getModulus();
+        this.rsaPublicKey = rsa.getChavePublica();
         gerarChave();
+    }
+
+    public BigInteger getPriavteKeyRsa(){
+        return privateKey;
+    }
+
+    public BigInteger getModulusRsa(){
+        return modulus;
+    }
+
+    public PublicKey getPublicKeyRsa(){
+        return rsaPublicKey;
     }
 
     public void gerarChave() {
