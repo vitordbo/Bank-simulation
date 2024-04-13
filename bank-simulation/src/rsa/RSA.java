@@ -56,5 +56,4 @@ public class RSA  {
     public BigInteger getModulus() {
         return modulus;
     }
-
 }

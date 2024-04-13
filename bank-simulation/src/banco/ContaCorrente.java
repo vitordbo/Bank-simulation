@@ -80,5 +80,4 @@ public class ContaCorrente implements Serializable {
     public Cliente getCliente() {
         return cliente;
     }
-    
 }
