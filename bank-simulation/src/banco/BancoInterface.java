@@ -34,4 +34,7 @@ public interface BancoInterface extends Remote {
     public byte[] calcularHash(byte[] message) throws RemoteException;
     public byte[] sign(byte[] message) throws RemoteException;
     public PublicKey getPublicKey() throws RemoteException;
+
+    // atualizar conta devido ao bloqueio
+    void atualizarConta(ContaCorrente conta) throws RemoteException;
 }

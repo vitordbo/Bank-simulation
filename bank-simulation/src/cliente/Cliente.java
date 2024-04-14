@@ -9,6 +9,8 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.Mac;
 import javax.crypto.SecretKey;
 
+import senha.ImplHashSalt;
+
 public class Cliente implements Serializable {
     private String senha;
     private String cpfCliente;
@@ -16,16 +18,21 @@ public class Cliente implements Serializable {
     private String telefoneCliente;
     private String enderecoCliente;
     private SecretKey chaveHMAC;
+    private String senhaHash; 
+    private byte[] salt; 
 
     // Implementação de Serializable
     private static final long serialVersionUID = 1L;
 
-    public Cliente(String senha, String cpfCliente, String nomeCliente, String telefoneCliente, String enderecoCliente) {
+    public Cliente(String senha, String cpfCliente, String nomeCliente, String telefoneCliente, String enderecoCliente) throws NoSuchAlgorithmException {
         this.senha = senha;
         this.cpfCliente = cpfCliente;
         this.nomeCliente = nomeCliente;
         this.telefoneCliente = telefoneCliente;
         this.enderecoCliente = enderecoCliente;
+        this.salt = ImplHashSalt.getSalt();
+        this.senhaHash = ImplHashSalt.getSenhaSegura(senha, salt);
+        
         gerarChaves();
     }
 
@@ -76,6 +83,14 @@ public class Cliente implements Serializable {
         this.nomeCliente = nomeCliente;
     }
 
+    public String getSenhaHash() {
+        return senhaHash;
+    }
+
+    public void setSenhaHash(String senhaHash) {
+        this.senhaHash = senhaHash;
+    }
+
     public String getEnderecoCliente() {
         return enderecoCliente;
     }
@@ -90,5 +105,13 @@ public class Cliente implements Serializable {
 
     public void setTelefoneCliente(String telefoneCliente) {
         this.telefoneCliente = telefoneCliente;
+    }
+
+    public byte[] getSalt() {
+        return salt;
+    }
+
+    public void setSalt(byte[] salt) {
+        this.salt = salt;
     }
 }

@@ -1,6 +1,7 @@
 package banco;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 import cliente.Cliente; 
 
@@ -13,6 +14,7 @@ public class ContaCorrente implements Serializable {
     private Cliente cliente;
     private double saldoPoupanca;
     private double saldoRendaFixa;
+    private LocalDateTime ultimaTentativaBloqueio;
 
     // Implementação de Serializable
     private static final long serialVersionUID = 1L;
@@ -75,6 +77,14 @@ public class ContaCorrente implements Serializable {
 
     public void setRendimentoRendaFixa(double rendimentoRendaFixa) {
         this.rendimentoRendaFixa += rendimentoRendaFixa;
+    }
+
+    public LocalDateTime getUltimaTentativaBloqueio() {
+        return ultimaTentativaBloqueio;
+    }
+
+    public void setUltimaTentativaBloqueio(LocalDateTime ultimaTentativaBloqueio) {
+        this.ultimaTentativaBloqueio = ultimaTentativaBloqueio;
     }
 
     public Cliente getCliente() {

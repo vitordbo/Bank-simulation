@@ -28,7 +28,7 @@ public class Banco extends UnicastRemoteObject implements BancoInterface {
     private double rendimentoPoupanca = 0.005; // 0.5% ao mês
     private double rendimentoRendaFixa = 0.015; // 1.5% ao mês
 
-    public Banco(ServidorChaves servidorChaves) throws RemoteException {
+    public Banco(ServidorChaves servidorChaves) throws RemoteException, NoSuchAlgorithmException {
         super();
         this.servidorChaves = servidorChaves;
         this.chaveAES = servidorChaves.getChave();
@@ -57,6 +57,12 @@ public class Banco extends UnicastRemoteObject implements BancoInterface {
         ContaCorrente novaConta = new ContaCorrente(numeroConta, cliente);
         contas.put(numeroConta, novaConta);
         System.out.println("Conta corrente criada com sucesso para o cliente " + nomeCliente + ".");
+    }
+
+    @Override
+    public void atualizarConta(ContaCorrente conta) throws RemoteException {
+        contas.put(conta.getNumeroConta(), conta);
+        System.out.println("Conta corrente atualizada: " + conta.getNumeroConta());
     }
 
     @Override
