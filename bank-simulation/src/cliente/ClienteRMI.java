@@ -4,6 +4,7 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.Random;
 import java.util.Scanner;
+
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
@@ -91,7 +92,7 @@ public class ClienteRMI {
                                             String msg = "Quero sacar money";
 
                                             // Verifica se a operação de saque está permitida pelo firewall
-                                            if (Firewall.firewallPermiteSaque(valor)) {
+                                            if (Firewall.firewallPermiteSaque(valor, true, contaCorrente)) {
                                                 // Criptografa a mensagem e gera o MAC
                                                 String mensagemCifrada = banco.cifrarComChaveAES(msg);
                                                 String mac = banco.gerarMACComChaveAES(msg);
@@ -115,7 +116,7 @@ public class ClienteRMI {
                                             String msgDepo = "Quero depositar money";
 
                                             // Verifica se a operação de deposito está permitida pelo firewall
-                                            if (Firewall.firewallPermiteDeposito(valorDepo)) {
+                                            if (Firewall.firewallPermiteDeposito(valorDepo, false, contaCorrente)) {
         
                                                 // Criptografa a mensagem e gera o MAC
                                                 String mensagemCifradaDepo = banco.cifrarComChaveAES(msgDepo);
@@ -129,7 +130,7 @@ public class ClienteRMI {
                                                 // Chama o método remoto no servidor para depositar
                                                 System.out.println(banco.depositar(contaCorrente.getNumeroConta(), valorDepo, mensagemCifradaDepo, macDepo, assinaturaDepo));
                                             } else {
-                                                System.out.println("Operação de saque bloqueada pelo firewall.");
+                                                System.out.println("Operação de deposito bloqueada pelo firewall.");
                                             }
 
                                         break;
@@ -156,7 +157,7 @@ public class ClienteRMI {
                                                 
                                                 System.out.println(banco.transferir(contaCorrente.getNumeroConta(), banco.obterConta(contaTrans).getNumeroConta(), valorTrans, mensagemCifradaTrans, macTrans, assinaturaTransf));
                                             } else {
-                                                System.out.println("Operação de saque bloqueada pelo firewall.");
+                                                System.out.println("Operação de transferencia bloqueada pelo firewall.");
                                             }
 
                                             break;
@@ -176,7 +177,7 @@ public class ClienteRMI {
                                                 // Chama o método remoto no servidor para ver o saldo
                                                 System.out.println(banco.verSaldo(contaCorrente.getNumeroConta(), mensagemCifradaSaldo, macSaldo, assinaturaSaldo));
                                             } else {
-                                                System.out.println("Operação de saque bloqueada pelo firewall.");
+                                                System.out.println("Operação de saldo bloqueada pelo firewall.");
                                             }
 
                                         break;
@@ -200,7 +201,7 @@ public class ClienteRMI {
                                                 System.out.println(banco.investirPoupanca(contaCorrente.getNumeroConta(), valorPoupan, mensagemCifradaPoupan, macPoupan, assinaturaPoupa));
                                             
                                             } else {
-                                                System.out.println("Operação de saque bloqueada pelo firewall.");
+                                                System.out.println("Operação de poupança bloqueada pelo firewall.");
                                             }
                                         break;
                                         case 6:
@@ -222,7 +223,7 @@ public class ClienteRMI {
                                                 // Chama o método remoto no servidor para investir
                                                 System.out.println(banco.investirRendaFixa(contaCorrente.getNumeroConta(), valorRendaFixa, mensagemCifradaRendaFixa, macRendaFixa, assinaturaRendaF));
                                             } else {
-                                                System.out.println("Operação de saque bloqueada pelo firewall.");
+                                                System.out.println("Operação de renda fixa bloqueada pelo firewall.");
                                             }
                                         break;
                                         case 7:
@@ -370,7 +371,7 @@ public class ClienteRMI {
                                             String msg = "Quero sacar money";
 
                                             // Verifica se a operação de saque está permitida pelo firewall
-                                            if (Firewall.firewallPermiteSaque(valor)) {
+                                            if (Firewall.firewallPermiteSaque(valor, true, contaCorrente)) {
                                                 // Criptografa a mensagem e gera o MAC
                                                 String mensagemCifrada = banco.cifrarComChaveAES(msg);
                                                 String mac = banco.gerarMACComChaveAES(msg);
@@ -394,7 +395,7 @@ public class ClienteRMI {
                                             String msgDepo = "Quero depositar money";
 
                                             // Verifica se a operação de deposito está permitida pelo firewall
-                                            if (Firewall.firewallPermiteDeposito(valorDepo)) {
+                                            if (Firewall.firewallPermiteDeposito(valorDepo, false, contaCorrente)) {
         
                                                 // Criptografa a mensagem e gera o MAC
                                                 String mensagemCifradaDepo = banco.cifrarComChaveAES(msgDepo);
@@ -408,7 +409,7 @@ public class ClienteRMI {
                                                 // Chama o método remoto no servidor para depositar
                                                 System.out.println(banco.depositar(contaCorrente.getNumeroConta(), valorDepo, mensagemCifradaDepo, macDepo, assinaturaDepo));
                                             } else {
-                                                System.out.println("Operação de saque bloqueada pelo firewall.");
+                                                System.out.println("Operação de deposito bloqueada pelo firewall.");
                                             }
                                         break;
                                         case 3:
@@ -434,7 +435,7 @@ public class ClienteRMI {
                                                 
                                                 System.out.println(banco.transferir(contaCorrente.getNumeroConta(), banco.obterConta(contaTrans).getNumeroConta(), valorTrans, mensagemCifradaTrans, macTrans, assinaturaTransf));
                                             } else {
-                                                System.out.println("Operação de saque bloqueada pelo firewall.");
+                                                System.out.println("Operação de transferencia bloqueada pelo firewall.");
                                             }
 
                                         break;
@@ -454,7 +455,7 @@ public class ClienteRMI {
                                                 // Chama o método remoto no servidor para ver o saldo
                                                 System.out.println(banco.verSaldo(contaCorrente.getNumeroConta(), mensagemCifradaSaldo, macSaldo, assinaturaSaldo));
                                             } else {
-                                                System.out.println("Operação de saque bloqueada pelo firewall.");
+                                                System.out.println("Operação de saldo bloqueada pelo firewall.");
                                             }
 
                                         break;
@@ -478,7 +479,7 @@ public class ClienteRMI {
                                                 System.out.println(banco.investirPoupanca(contaCorrente.getNumeroConta(), valorPoupan, mensagemCifradaPoupan, macPoupan, assinaturaPoupa));
                                             
                                             } else {
-                                                System.out.println("Operação de saque bloqueada pelo firewall.");
+                                                System.out.println("Operação de poupança bloqueada pelo firewall.");
                                             } 
                                         break;
                                         case 6:
@@ -500,7 +501,7 @@ public class ClienteRMI {
                                                 // Chama o método remoto no servidor para investir
                                                 System.out.println(banco.investirRendaFixa(contaCorrente.getNumeroConta(), valorRendaFixa, mensagemCifradaRendaFixa, macRendaFixa, assinaturaRendaF));
                                             } else {
-                                                System.out.println("Operação de saque bloqueada pelo firewall.");
+                                                System.out.println("Operação de renda fixa bloqueada pelo firewall.");
                                             }
                                             break;
                                         case 7:

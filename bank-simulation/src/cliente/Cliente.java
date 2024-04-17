@@ -25,7 +25,6 @@ public class Cliente implements Serializable {
     private static final long serialVersionUID = 1L;
 
     public Cliente(String senha, String cpfCliente, String nomeCliente, String telefoneCliente, String enderecoCliente) throws NoSuchAlgorithmException {
-        this.senha = senha;
         this.cpfCliente = cpfCliente;
         this.nomeCliente = nomeCliente;
         this.telefoneCliente = telefoneCliente;

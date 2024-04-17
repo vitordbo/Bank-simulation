@@ -501,6 +501,40 @@ public class Banco extends UnicastRemoteObject implements BancoInterface {
         }
     }
 
+    /* 
+    @Override
+    public boolean verifySignature(byte[] message, byte[] signature) {
+        try {
+            // Transforma a chave pública em RSAPublicKey
+            RSAPublicKey rsaPubKey = (RSAPublicKey) servidorChaves.getPublicKeyRsa();
+
+            // Calcula o hash da mensagem
+            byte[] calculatedHash = calcularHash(message);
+
+            // Converte a assinatura recebida em um BigInteger
+            BigInteger sig = new BigInteger(signature);
+
+            // Executa a operação de exponenciação modular para obter a assinatura decifrada
+            BigInteger decryptedSignature = sig.modPow(rsaPubKey.getPublicExponent(), rsaPubKey.getModulus());
+
+            // Converte o hash calculado em BigInteger
+            BigInteger hashBigInt = new BigInteger(1, calculatedHash);
+
+            // Verifica se a assinatura decifrada é igual ao hash calculado
+            if (decryptedSignature.equals(hashBigInt)) {
+                System.out.println("Assinatura válida.");
+                return true;
+            } else {
+                System.out.println("Assinatura inválida.");
+                return false;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    */
+
     @Override
     public boolean verifySignature(byte[] message, byte[] signature) {
         try {
